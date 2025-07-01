@@ -1,8 +1,6 @@
 import QrCodeStyling from "qr-code-styling";
-import "./index.css";
 import NodesBinder from "./js/nodes-binder";
 import { getSrcFromFile } from "./js/tools";
-import defaultImage from "./assets/logo.png";
 
 const form = document.getElementById("form");
 const descriptionContainer = document.getElementById("qr-description");
@@ -16,7 +14,7 @@ delete initState.dotsOptions.gradient;
 
 const qrCode = new QrCodeStyling({
     ...initState,
-    image: defaultImage,
+    image: "/assets/logo.png",
 });
 
 function updateDescriptionContainerBackground(backgroundColor, qrColor) {

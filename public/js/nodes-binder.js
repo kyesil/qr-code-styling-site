@@ -52,7 +52,7 @@ export default class NodesBinder {
     }
 
     _getNodeKey() {
-        return "node";
+        return "data-node";
     }
 
     _getNodeStateKey(node) {
