@@ -1,22 +1,24 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="Generate branded QR code online, you can add image and color to your QR code. Use the QR code styling library in your site to generate QR codes dynamically." />
-    <meta name="keywords" content="qr, qr code, qrcode, style, styling, brand, branding, color, image, create, creating, generate, generator, generating" />
+    <meta name="description" content="Create free QR codes with logo or image. Use our online QR code generator to customize your QR codes with images, colors, and branding. Fast, easy, and free QR generator with image support." />
+    <meta name="keywords" content="free qr code generator, qr code generator with logo, qr generator with image, qr code, qr code maker, branded qr code, custom qr code" />
     <link rel="preconnect" href="https://www.google-analytics.com">
     <link rel="shortcut icon" type="image/x-icon" href="/assets/qr_trans.png" />
-    <title>QR Code Styling</title>
-	<link rel="stylesheet" href="/public/index.css">
-	<script type="module" src="/public/index.js"></script>
+    <title>Free QR Code Generator with Logo | QR Generator with Image</title>
+	<link rel="stylesheet" href="/index.css">
+    <script >
+        import '/src/scripts/index.js';
+    </script>
+
 </head>
 <body>
     <header class="container qr-header">
         <div class="row row--qr-header">
             <div class="col qr-logo">
-                <img class="qr-logo__img" src="/assets/logo1.png" alt="QR code styling logo" />
+                <img class="qr-logo__img" src="/assets/logo1.png" alt="Free QR code generator with logo" />
             </div>
             <a target="_blank" rel="noopener" class="col white" href="https://www.npmjs.com/package/qr-code-styling">npm v1.8.3</a>
             <a target="_blank" rel="noopener" class="col white" href="https://github.com/kozakdenys/qr-code-styling">GitHub</a>
@@ -24,11 +26,10 @@
     </header>
     <main>
         <section class="container qr-description" id="qr-description">
-            <div class="col">
-                <h1 class="qr-description__lib-name">QR Code Styling</h1>
-                <p>An open source JS library</p>
-                <p>For generating styled QR codes</p>
-            </div>
+   
+                <h1 class="qr-description__lib-name">Free QR Code Generator with Logo and Image</h1>
+                <p>Generate free, high-quality QR codes with your logo or any image. Our online QR code generator lets you customize your QR codes with colors, images, and branding for your business or personal use.</p>
+      
         </section>
         <section class="container">
             <div class="row row--body">
@@ -278,11 +279,12 @@
                         </div>
                     </div>
                     <div class="options-export-group">
-                        <a class="button" id="export-options">Export Options as JSON</a>
+                        <a class="button" id="export-options">Export JSON</a>
+                        <a class="button" id="import-options">Import JSON</a>
                     </div>
                 </form>
                 <div class="col qr-code-container">
-                    <div class="qr-code" id="qr-code-generated"></div>
+                    <div class="qr-code" id="qr-code-generated" aria-label="Generated QR code with image"></div>
                     <div class="qr-download-group">
                         <button id="qr-download">Download</button>
                         <label class="hide" for="qr-extension">Extension</label>

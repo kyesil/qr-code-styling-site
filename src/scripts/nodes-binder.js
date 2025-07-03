@@ -1,7 +1,8 @@
 import { flatToNested, nestedToFlat } from "./tools";
 
 export default class NodesBinder {
-    constructor({ root } = {}) {
+    constructor({ root ,nodekey} = {}) {
+        this.nodekey = nodekey ;
         if (root) {
             this.init({ root });
         }
@@ -52,7 +53,7 @@ export default class NodesBinder {
     }
 
     _getNodeKey() {
-        return "data-node";
+        return this.nodekey;
     }
 
     _getNodeStateKey(node) {

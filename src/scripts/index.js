@@ -1,20 +1,33 @@
 import QrCodeStyling from "qr-code-styling";
-import NodesBinder from "./js/nodes-binder";
-import { getSrcFromFile } from "./js/tools";
+import NodesBinder from "./nodes-binder";
+import { getSrcFromFile } from "./tools";
+
+import { getFormData, setFormData ,toBase64} from "./formutil";
+const NODE_KEY = "data-node";
 
 const form = document.getElementById("form");
 const descriptionContainer = document.getElementById("qr-description");
 
+
+
+const json = localStorage.getItem("qr-code-form");
+const formdata = json && json !== "undefined" ? JSON.parse(json) : null;
+
+
+setFormData(form, formdata, NODE_KEY);
+
 const nodesBinder = new NodesBinder({
-    root: form
+    root: form,
+    nodekey: NODE_KEY
 });
 const initState = nodesBinder.getState();
+
 
 delete initState.dotsOptions.gradient;
 
 const qrCode = new QrCodeStyling({
     ...initState,
-    image: "/assets/logo.png",
+    image: formdata["form-image-file"] ||null,
 });
 
 function updateDescriptionContainerBackground(backgroundColor, qrColor) {
@@ -33,16 +46,16 @@ function updateDescriptionContainerBackground(backgroundColor, qrColor) {
 
 function getPerceptualBrightness(color) {
 
-    const r = parseInt(color.substring(1,3),16);
-    const g = parseInt(color.substring(3,5),16);
-    const b = parseInt(color.substring(5,6),16);
+    const r = parseInt(color.substring(1, 3), 16);
+    const g = parseInt(color.substring(3, 5), 16);
+    const b = parseInt(color.substring(5, 6), 16);
 
     return r + g + b;
 }
 
 updateDescriptionContainerBackground(initState.dotsOptions.color, initState.backgroundOptions.color);
 
-nodesBinder.onStateUpdate(({ field, data }) => {
+nodesBinder.onStateUpdate(async ({ field, data }) => {
     const { image, imageUrl, dotsOptionsHelper, cornersSquareOptionsHelper, cornersDotOptionsHelper, backgroundOptionsHelper, ...state } = nodesBinder.getState();
 
     updateDescriptionContainerBackground(state.dotsOptions.color, state.backgroundOptions.color);
@@ -63,7 +76,7 @@ nodesBinder.onStateUpdate(({ field, data }) => {
 
     if (field === "dotsOptionsHelper.colorType.gradient" && data) {
         const showElements = document.getElementsByClassName("dotsOptionsHelper.colorType.gradient")
-        const hideElements =document.getElementsByClassName("dotsOptionsHelper.colorType.single")
+        const hideElements = document.getElementsByClassName("dotsOptionsHelper.colorType.single")
 
         Array.from(showElements).forEach((element) => {
             element.style.visibility = "visible";
@@ -96,7 +109,7 @@ nodesBinder.onStateUpdate(({ field, data }) => {
 
     if (field === "dotsOptionsHelper.colorType.single" && data) {
         const showElements = document.getElementsByClassName("dotsOptionsHelper.colorType.single")
-        const hideElements =document.getElementsByClassName("dotsOptionsHelper.colorType.gradient")
+        const hideElements = document.getElementsByClassName("dotsOptionsHelper.colorType.gradient")
 
         Array.from(showElements).forEach((element) => {
             element.style.visibility = "visible";
@@ -187,7 +200,7 @@ nodesBinder.onStateUpdate(({ field, data }) => {
 
     if (field === "cornersSquareOptionsHelper.colorType.gradient" && data) {
         const showElements = document.getElementsByClassName("cornersSquareOptionsHelper.colorType.gradient")
-        const hideElements =document.getElementsByClassName("cornersSquareOptionsHelper.colorType.single")
+        const hideElements = document.getElementsByClassName("cornersSquareOptionsHelper.colorType.single")
 
         Array.from(showElements).forEach((element) => {
             element.style.visibility = "visible";
@@ -220,7 +233,7 @@ nodesBinder.onStateUpdate(({ field, data }) => {
 
     if (field === "cornersSquareOptionsHelper.colorType.single" && data) {
         const showElements = document.getElementsByClassName("cornersSquareOptionsHelper.colorType.single")
-        const hideElements =document.getElementsByClassName("cornersSquareOptionsHelper.colorType.gradient")
+        const hideElements = document.getElementsByClassName("cornersSquareOptionsHelper.colorType.gradient")
 
         Array.from(showElements).forEach((element) => {
             element.style.visibility = "visible";
@@ -310,7 +323,7 @@ nodesBinder.onStateUpdate(({ field, data }) => {
 
     if (field === "cornersDotOptionsHelper.colorType.gradient" && data) {
         const showElements = document.getElementsByClassName("cornersDotOptionsHelper.colorType.gradient")
-        const hideElements =document.getElementsByClassName("cornersDotOptionsHelper.colorType.single")
+        const hideElements = document.getElementsByClassName("cornersDotOptionsHelper.colorType.single")
 
         Array.from(showElements).forEach((element) => {
             element.style.visibility = "visible";
@@ -343,7 +356,7 @@ nodesBinder.onStateUpdate(({ field, data }) => {
 
     if (field === "cornersDotOptionsHelper.colorType.single" && data) {
         const showElements = document.getElementsByClassName("cornersDotOptionsHelper.colorType.single")
-        const hideElements =document.getElementsByClassName("cornersDotOptionsHelper.colorType.gradient")
+        const hideElements = document.getElementsByClassName("cornersDotOptionsHelper.colorType.gradient")
 
         Array.from(showElements).forEach((element) => {
             element.style.visibility = "visible";
@@ -435,7 +448,7 @@ nodesBinder.onStateUpdate(({ field, data }) => {
 
     if (field === "backgroundOptionsHelper.colorType.gradient" && data) {
         const showElements = document.getElementsByClassName("backgroundOptionsHelper.colorType.gradient")
-        const hideElements =document.getElementsByClassName("backgroundOptionsHelper.colorType.single")
+        const hideElements = document.getElementsByClassName("backgroundOptionsHelper.colorType.single")
 
         Array.from(showElements).forEach((element) => {
             element.style.visibility = "visible";
@@ -468,7 +481,7 @@ nodesBinder.onStateUpdate(({ field, data }) => {
 
     if (field === "backgroundOptionsHelper.colorType.single" && data) {
         const showElements = document.getElementsByClassName("backgroundOptionsHelper.colorType.single")
-        const hideElements =document.getElementsByClassName("backgroundOptionsHelper.colorType.gradient")
+        const hideElements = document.getElementsByClassName("backgroundOptionsHelper.colorType.gradient")
 
         Array.from(showElements).forEach((element) => {
             element.style.visibility = "visible";
@@ -555,9 +568,15 @@ nodesBinder.onStateUpdate(({ field, data }) => {
         });
         return;
     }
-
-
     qrCode.update(state);
+    
+    const form = document.getElementById("form");
+    const fdata = await getFormData(form, NODE_KEY);
+    const imagefile = document.getElementById("form-image-file");
+    if(imagefile.files && imagefile.files.length > 0) {
+        fdata["form-image-file"] = await toBase64(imagefile.files[0]);
+    }
+    localStorage.setItem("qr-code-form", JSON.stringify(fdata));
 });
 
 const qrContainer = document.getElementById("qr-code-generated");
@@ -570,16 +589,20 @@ document.getElementById("button-cancel").onclick = () => {
 
 document.getElementById("button-clear-corners-square-color").onclick = () => {
     const state = nodesBinder.getState();
-    nodesBinder.setState({ cornersSquareOptions: {
-        color: state.dotsOptions.color
-    }});
+    nodesBinder.setState({
+        cornersSquareOptions: {
+            color: state.dotsOptions.color
+        }
+    });
 };
 
 document.getElementById("button-clear-corners-dot-color").onclick = () => {
     const state = nodesBinder.getState();
-    nodesBinder.setState({ cornersDotOptions: {
-        color: state.dotsOptions.color
-    }});
+    nodesBinder.setState({
+        cornersDotOptions: {
+            color: state.dotsOptions.color
+        }
+    });
 };
 
 document.getElementById("qr-download").onclick = () => {
@@ -587,11 +610,65 @@ document.getElementById("qr-download").onclick = () => {
     qrCode.download({ extension, name: "qr-code-styling" });
 };
 
-//Download options
-document.getElementById("export-options").addEventListener("click", function() {
-    const dataStr = `data:text/json;charset=utf-8,${encodeURIComponent(JSON.stringify(qrCode._options))}`;
-    this.setAttribute("href",dataStr);
-    this.setAttribute("download", "options.json");
+
+function download(filename, text) {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([text], { type: 'application/json' }));
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(a.href);
+}
+
+
+document.getElementById("export-options").addEventListener("click", async ()=>{
+    const form = document.getElementById("form");
+    const fdata = await getFormData(form, NODE_KEY);
+    const imagefile = document.getElementById("form-image-file");
+    if(imagefile.files && imagefile.files.length > 0) {
+        fdata["form-image-file"] = await toBase64(imagefile.files[0]);
+    }
+
+    const blob = new Blob([JSON.stringify(fdata)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'form-data.json';
+    document.body.appendChild(a);
+    a.click();
+    URL.revokeObjectURL(url);
+    a.remove();
+});
+
+
+document.getElementById("import-options").addEventListener("click", () =>{
+    const form = document.getElementById("form");
+    let importInput = document.getElementById("import-options-input");
+    if (!importInput) {
+        importInput = document.createElement("input");
+        importInput.type = "file";
+        importInput.accept = ".json,application/json";
+        importInput.style.display = "none";
+        importInput.id = "import-options-input";
+        importInput.addEventListener('change', e => {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = evt => {
+                try {
+                    const json = JSON.parse(evt.target.result);
+                    setFormData(form, json, NODE_KEY);
+                } catch (err) {
+                    alert('Invalid JSON file');
+                }
+            };
+            reader.readAsText(file);
+            fileInput.value = '';
+        });
+        document.body.appendChild(importInput);
+    }
+
+    importInput.value = ""; // reset
+    importInput.click();
 });
 
 //Accordion
@@ -602,7 +679,7 @@ for (let i = 0; i < acc.length; i++) {
         continue;
     }
 
-    acc[i].addEventListener("click", function() {
+    acc[i].addEventListener("click", function () {
         this.classList.toggle("active");
 
         const panel = this.nextElementSibling;
