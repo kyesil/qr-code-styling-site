@@ -2,7 +2,7 @@ import QrCodeStyling from "qr-code-styling";
 import NodesBinder from "./nodes-binder";
 import { getSrcFromFile } from "./tools";
 
-import { getFormData, setFormData ,toBase64} from "./formutil";
+import { getFormData, setFormData, toBase64 } from "./formutil";
 const NODE_KEY = "data-node";
 
 const form = document.getElementById("form");
@@ -27,8 +27,9 @@ delete initState.dotsOptions.gradient;
 
 const qrCode = new QrCodeStyling({
     ...initState,
-    image: formdata?formdata["form-image-file"]?? null:null,
+    image: formdata ? formdata["form-image-file"] ?? null : "/assets/linux.png",
 });
+updateText(initState.text);
 
 function updateDescriptionContainerBackground(backgroundColor, qrColor) {
     let leftColor, rightColor;
@@ -52,13 +53,81 @@ function getPerceptualBrightness(color) {
 
     return r + g + b;
 }
+async function updateText(text, pos = "bottom") {
+    await qrCode._canvasDrawingPromise; // canvasın çizilmesini bekle
+    const canvas = qrCode._domCanvas;
+    const ctx = canvas.getContext("2d");
+    const tempCanvas = document.createElement('canvas');
+    const tempCtx = tempCanvas.getContext('2d');
+    const qrwith = canvas.width;
+    tempCanvas.width = canvas.width;
+    tempCanvas.height = canvas.height;
+    tempCtx.drawImage(canvas, 0, 0);
+    if (pos === "right")
+        canvas.width += qrwith; // 400
+    else canvas.height += 50; // 400 
+    ctx.fillStyle = qrCode._options.backgroundOptions.color || "#ffffff";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(tempCanvas, 0, 0);
 
+    ctx.fillStyle = "black";
+    ctx.baseAlign = "top";
+    let x = 0, y = 0;
+    if (pos === "right") {
+        ctx.font = "50px Roboto";
+        x = canvas.width / 2 + 40;
+        y = 70;
+        // ctx.textAlign = "center";
+        let len = text.length;
+        if (len > 36)
+            text = text.substring(0, 36)
+        if (len > 13)
+            ctx.font = "italic " + (50 - (len - 14) * 2.5) + "px Roboto";
+
+    } else{
+        x = canvas.width / 2;
+        y = canvas.height - 20;
+        ctx.font = "italic 40px Roboto";
+        ctx.textAlign = "center";
+     
+    }
+    const tt = ctx.measureText(text); // TextMetrics object
+    tt.width; // 16;
+    console.log("text mesure", tt);
+    ctx.fillText(text, x, y);
+
+
+    //altına
+    // await qrCode._canvasDrawingPromise; // canvasın çizilmesini bekle
+    // const canvas = qrCode._domCanvas;
+    // const ctx = canvas.getContext("2d");
+    // const tempCanvas = document.createElement('canvas');
+    // const tempCtx = tempCanvas.getContext('2d');
+    // tempCanvas.width = canvas.width;
+    // tempCanvas.height = canvas.height;
+    // tempCtx.drawImage(canvas, 0, 0);
+    // ctx.drawImage(tempCanvas, 0, 0);
+    // const x = canvas.width / 2;
+    // const y = canvas.height - 10;
+    // ctx.textAlign = "center";
+    // ctx.baseAlign = "top";
+    // ctx.font = "22px Roboto";
+    // const textBottom = text;
+    // ctx.fillText(textBottom, x, y);
+}
 updateDescriptionContainerBackground(initState.dotsOptions.color, initState.backgroundOptions.color);
 
 nodesBinder.onStateUpdate(async ({ field, data }) => {
     const { image, imageUrl, dotsOptionsHelper, cornersSquareOptionsHelper, cornersDotOptionsHelper, backgroundOptionsHelper, ...state } = nodesBinder.getState();
 
     updateDescriptionContainerBackground(state.dotsOptions.color, state.backgroundOptions.color);
+
+    // if (field === "text") {
+    //     console.log("text changed", data);
+    //     qrCode.update();
+
+    //     return
+    // }
 
     if (field === "image") {
         if (data && data[0]) {
@@ -569,11 +638,11 @@ nodesBinder.onStateUpdate(async ({ field, data }) => {
         return;
     }
     qrCode.update(state);
-
+    await updateText(state.text,state.textpos);
     const form = document.getElementById("form");
     const fdata = await getFormData(form, NODE_KEY);
     const imagefile = document.getElementById("form-image-file");
-    if(imagefile.files && imagefile.files.length > 0) {
+    if (imagefile.files && imagefile.files.length > 0) {
         fdata["form-image-file"] = await toBase64(imagefile.files[0]);
     }
     localStorage.setItem("qr-code-form", JSON.stringify(fdata));
@@ -620,11 +689,11 @@ function download(filename, text) {
 }
 
 
-document.getElementById("export-options").addEventListener("click", async ()=>{
+document.getElementById("export-options").addEventListener("click", async () => {
     const form = document.getElementById("form");
     const fdata = await getFormData(form, NODE_KEY);
     const imagefile = document.getElementById("form-image-file");
-    if(imagefile.files && imagefile.files.length > 0) {
+    if (imagefile.files && imagefile.files.length > 0) {
         fdata["form-image-file"] = await toBase64(imagefile.files[0]);
     }
 
@@ -640,7 +709,7 @@ document.getElementById("export-options").addEventListener("click", async ()=>{
 });
 
 
-document.getElementById("import-options").addEventListener("click", () =>{
+document.getElementById("import-options").addEventListener("click", () => {
     const form = document.getElementById("form");
     let importInput = document.getElementById("import-options-input");
     if (!importInput) {

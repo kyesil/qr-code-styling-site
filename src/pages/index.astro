@@ -27,9 +27,9 @@
     <main>
         <section class="container qr-description" id="qr-description">
    
-                <h1 class="qr-description__lib-name">Free QR Code Generator with Logo and Image</h1>
-                <p>Generate free, high-quality QR codes with your logo or any image. Our online QR code generator lets you customize your QR codes with colors, images, and branding for your business or personal use.</p>
-      
+                <h2 >Free QR Code Generator with Image</h2>
+                <p>Generate free, high-quality QR codes with your any image. Our online QR code generator lets you customize your QR codes with colors, images, and branding for your business or personal use.</p>
+                <p>*All your config will save browser storage</p>
         </section>
         <section class="container">
             <div class="row row--body">
@@ -43,6 +43,7 @@
                             <input data-node="image" node-data-field="files" id="form-image-file" type="file" accept="image/*" />
                             <button type="button" id="button-cancel">Cancel</button>
                         </div>
+                        
                         <label for="form-width">Width</label>
                         <div>
                             <input data-node="width" id="form-width" type="number" min="100" max="10000" value="600"/>
@@ -54,6 +55,16 @@
                         <label for="form-height">Margin</label>
                         <div>
                             <input data-node="margin" id="form-margin" type="number" min="0" max="10000" value="20"/>
+                        </div>
+                        <label for="form-text">Text</label>
+                        <textarea data-node="text" node-change-event="oninput" id="form-text" value="">text</textarea>
+                        <label for="form-text-pos">Text Pos</label>
+                        <div>
+                            <select data-node="textpos" id="form-text-pos">
+                                <option value="right">Right</option>
+                                <option value="bottom" selected>Bottom</option>
+                             
+                            </select>
                         </div>
                     </div>
                     <button type="button" class="accordion">Dots Options</button>
