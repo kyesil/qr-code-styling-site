@@ -27,7 +27,7 @@ delete initState.dotsOptions.gradient;
 
 const qrCode = new QrCodeStyling({
     ...initState,
-    image: formdata["form-image-file"] ||null,
+    image: formdata?formdata["form-image-file"]?? null:null,
 });
 
 function updateDescriptionContainerBackground(backgroundColor, qrColor) {
@@ -569,7 +569,7 @@ nodesBinder.onStateUpdate(async ({ field, data }) => {
         return;
     }
     qrCode.update(state);
-    
+
     const form = document.getElementById("form");
     const fdata = await getFormData(form, NODE_KEY);
     const imagefile = document.getElementById("form-image-file");
