@@ -2,7 +2,8 @@ import QrCodeStyling from "qr-code-styling";
 import NodesBinder from "./nodes-binder";
 import { getSrcFromFile } from "./tools";
 
-import { getFormData, setFormData, toBase64 } from "./formutil";
+import { getFormData, setFormData, toBase64 } from "./form-util";
+import { drawText } from "./canvas-util";
 const NODE_KEY = "data-node";
 
 const form = document.getElementById("form");
@@ -14,7 +15,9 @@ const json = localStorage.getItem("qr-code-form");
 const formdata = json && json !== "undefined" ? JSON.parse(json) : null;
 
 
-setFormData(form, formdata, NODE_KEY);
+const inputList=form.querySelectorAll(`[${NODE_KEY}]`);
+
+setFormData(inputList, formdata);
 
 const nodesBinder = new NodesBinder({
     root: form,
@@ -29,7 +32,7 @@ const qrCode = new QrCodeStyling({
     ...initState,
     image: formdata ? formdata["form-image-file"] ?? null : "/assets/linux.png",
 });
-updateText(initState.text);
+await drawText({qrCode,text:initState.text,pos:initState.textpos});
 
 function updateDescriptionContainerBackground(backgroundColor, qrColor) {
     let leftColor, rightColor;
@@ -53,68 +56,7 @@ function getPerceptualBrightness(color) {
 
     return r + g + b;
 }
-async function updateText(text, pos = "bottom") {
-    await qrCode._canvasDrawingPromise; // canvasın çizilmesini bekle
-    const canvas = qrCode._domCanvas;
-    const ctx = canvas.getContext("2d");
-    const tempCanvas = document.createElement('canvas');
-    const tempCtx = tempCanvas.getContext('2d');
-    const qrwith = canvas.width;
-    tempCanvas.width = canvas.width;
-    tempCanvas.height = canvas.height;
-    tempCtx.drawImage(canvas, 0, 0);
-    if (pos === "right")
-        canvas.width += qrwith; // 400
-    else canvas.height += 50; // 400 
-    ctx.fillStyle = qrCode._options.backgroundOptions.color || "#ffffff";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.drawImage(tempCanvas, 0, 0);
 
-    ctx.fillStyle = "black";
-    ctx.baseAlign = "top";
-    let x = 0, y = 0;
-    if (pos === "right") {
-        ctx.font = "50px Roboto";
-        x = canvas.width / 2 + 40;
-        y = 70;
-        // ctx.textAlign = "center";
-        let len = text.length;
-        if (len > 36)
-            text = text.substring(0, 36)
-        if (len > 13)
-            ctx.font = "italic " + (50 - (len - 14) * 2.5) + "px Roboto";
-
-    } else{
-        x = canvas.width / 2;
-        y = canvas.height - 20;
-        ctx.font = "italic 40px Roboto";
-        ctx.textAlign = "center";
-     
-    }
-    const tt = ctx.measureText(text); // TextMetrics object
-    tt.width; // 16;
-    console.log("text mesure", tt);
-    ctx.fillText(text, x, y);
-
-
-    //altına
-    // await qrCode._canvasDrawingPromise; // canvasın çizilmesini bekle
-    // const canvas = qrCode._domCanvas;
-    // const ctx = canvas.getContext("2d");
-    // const tempCanvas = document.createElement('canvas');
-    // const tempCtx = tempCanvas.getContext('2d');
-    // tempCanvas.width = canvas.width;
-    // tempCanvas.height = canvas.height;
-    // tempCtx.drawImage(canvas, 0, 0);
-    // ctx.drawImage(tempCanvas, 0, 0);
-    // const x = canvas.width / 2;
-    // const y = canvas.height - 10;
-    // ctx.textAlign = "center";
-    // ctx.baseAlign = "top";
-    // ctx.font = "22px Roboto";
-    // const textBottom = text;
-    // ctx.fillText(textBottom, x, y);
-}
 updateDescriptionContainerBackground(initState.dotsOptions.color, initState.backgroundOptions.color);
 
 nodesBinder.onStateUpdate(async ({ field, data }) => {
@@ -638,9 +580,8 @@ nodesBinder.onStateUpdate(async ({ field, data }) => {
         return;
     }
     qrCode.update(state);
-    await updateText(state.text,state.textpos);
-    const form = document.getElementById("form");
-    const fdata = await getFormData(form, NODE_KEY);
+    await drawText({ qrCode: qrCode, text: state.text, pos: state.textpos });
+    const fdata = await getFormData(inputList);
     const imagefile = document.getElementById("form-image-file");
     if (imagefile.files && imagefile.files.length > 0) {
         fdata["form-image-file"] = await toBase64(imagefile.files[0]);

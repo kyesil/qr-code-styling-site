@@ -161,7 +161,7 @@ input[type="text"], input[type="number"] {
 
 .container > * {
     width: 100%;
-    max-width: 1008px;
+    max-width: 1200px;
 }
 
 .row {
@@ -254,7 +254,7 @@ input[type="text"], input[type="number"] {
 }
 
 .qr-code canvas {
-    max-width: 300px!important;
+    max-width: 500px!important;
     width: 100%;
 }
 

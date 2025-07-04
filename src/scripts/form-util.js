@@ -7,19 +7,17 @@ export async function toBase64(file) {
   });
 }
 
-export async function getFormData(form, nodekey) {
+export async function getFormData(inputList) {
   const fdata = {};
-  const elements = form.querySelectorAll(`[${nodekey}]`);
-  Array.from(elements).forEach(async el => {
+  Array.from(inputList).forEach(async el => {
     const name = el.id.trim();
     if (!name) return;  // skip unnamed fields
     switch (el.type) {
       case 'checkbox':
-        fdata[name] = fdata[name] || [];
-        if (el.checked) fdata[name].push(el.value);
+        fdata[name] = el.checked
         break;
       case 'radio':
-        if (el.checked) fdata[name] = el.value;
+        fdata[name] = el.checked; 
         break;
       case 'select-multiple':
         fdata[name] = Array.from(el.selectedOptions).map(o => o.value);
@@ -28,7 +26,7 @@ export async function getFormData(form, nodekey) {
         fdata[name] = el.value;
         break;
       case 'file':
-        
+
         break;
       default:
         fdata[name] = el.value;
@@ -38,21 +36,20 @@ export async function getFormData(form, nodekey) {
 }
 
 
-export function setFormData(form, data, nodekey) {
+export function setFormData(inputList, data) {
 
-  Array.from(form.querySelectorAll(`[${nodekey}]`)).forEach(els => {
+  Array.from(inputList).forEach(els => {
     const name = els.id;
     if (!data || !data[name]) return;
     if (els.type === 'file') return;
     const value = data[name];
     if (els.type === 'radio') {
-      form.querySelectorAll(`input[name="${name}"]`)
-        .forEach(r => r.checked = (r.value === value));
+      els.checked = value;
     } else if (els.type === 'checkbox') {
-      form.querySelectorAll(`input[name="${name}"]`)
-        .forEach(cb => cb.checked = Array.isArray(value)
-          ? value.includes(cb.value)
-          : Boolean(value));
+      if(value === false || value === 'false') {
+        els.removeAttribute('checked');
+      } else
+      els.checked = value;
     } else if (els instanceof HTMLSelectElement) {
       if (els.multiple) {
         Array.from(els.options)

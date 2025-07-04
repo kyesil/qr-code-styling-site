@@ -2,8 +2,10 @@
   "name": "astroqr",
   "type": "module",
   "version": "0.0.1",
+  "description": "A simple Astro project to generate QR codes with custom styles.",
+
   "scripts": {
-    "dev": "astro dev",
+    "start": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro"
