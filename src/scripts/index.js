@@ -631,8 +631,7 @@ function download(filename, text) {
 
 
 document.getElementById("export-options").addEventListener("click", async () => {
-    const form = document.getElementById("form");
-    const fdata = await getFormData(form, NODE_KEY);
+    const fdata = await getFormData(inputList);
     const imagefile = document.getElementById("form-image-file");
     if (imagefile.files && imagefile.files.length > 0) {
         fdata["form-image-file"] = await toBase64(imagefile.files[0]);
@@ -651,7 +650,6 @@ document.getElementById("export-options").addEventListener("click", async () => 
 
 
 document.getElementById("import-options").addEventListener("click", () => {
-    const form = document.getElementById("form");
     let importInput = document.getElementById("import-options-input");
     if (!importInput) {
         importInput = document.createElement("input");
@@ -666,7 +664,7 @@ document.getElementById("import-options").addEventListener("click", () => {
             reader.onload = evt => {
                 try {
                     const json = JSON.parse(evt.target.result);
-                    setFormData(form, json, NODE_KEY);
+                    setFormData(inputList, json);
                 } catch (err) {
                     alert('Invalid JSON file');
                 }
