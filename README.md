@@ -2,7 +2,7 @@
 The example page for this library https://www.npmjs.com/package/qr-code-styling
 
 ### Working Example 
-https://qr.bpv.tr
+https://qr.yesil.dev
 
 # Astro Project
 ## 🚀 Project Structure
