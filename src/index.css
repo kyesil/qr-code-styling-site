@@ -140,7 +140,7 @@ input[type="text"], input[type="number"] {
 }
 
 .panel {
-    padding: 20px;
+    padding: 10px;
     background-color: #f0f0f0;
     display: none;
     overflow: hidden;
@@ -152,7 +152,12 @@ input[type="text"], input[type="number"] {
 .panel.panel--open {
     display: grid;
 }
-
+.panel .group{
+    grid-column: 1/-1;
+    &> label {
+      margin-left: 10px;
+    }
+}
 .container {
     display: flex;
     flex-direction: column;
